@@ -6,16 +6,6 @@
 
 source config.tcl
 
-# Generates random test values
-proc generate_random_values {} {
-    set data_size [expr {int(rand() * 200) + 1}] 
-    set random_data ""
-    # let's generate random data
-    for {set i 0} {$i < $data_size} {incr i} {
-        set random_data "${random_data}[format %c [expr {int(rand() * 256)}]]"
-    }
-    return [binary encode hex $random_data]
-}
 
 # Generates random data
 proc random_gen {length} {
@@ -24,6 +14,13 @@ proc random_gen {length} {
 	close $random_bytes
 	binary encode hex $random_data
 }
+
+# Generates random test values
+proc generate_random_values {} {
+    set len [expr {int(rand() * 200) + 1}] 
+		random_gen len
+}
+
 # Generates random bucket_path
 proc bucket_path_generator {} {
 	set path [random_gen 8]
