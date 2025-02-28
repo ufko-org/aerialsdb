@@ -68,22 +68,23 @@ proc bucket_set {meta value} {
 }
 
 # This is going to be fun :D :D
-proc bucket_get {jsonkey jsonval} {
+proc bucket_get {jsonkey jsonval {limit 1}} {
 	# meta value {"file": "file.png", "size": "1024KB", "description": "Image file", "created": "2025-02-27"}
+
 	sqlite3 db aerial.sq3
-	set bucket_info [db eval "select dir1, dir2, file, row_key from buckets_meta where json_extract(meta, '\$.$jsonkey') = '$jsonval'"]
-	db close
-	# foreach?
-	set dir1 [lindex $bucket_info 0]
-	set dir2 [lindex $bucket_info 1]
-	set file [lindex $bucket_info 2]
-	set key  [lindex $bucket_info 3]
-	sqlite3 db "$::bucket_root/$dir1/$dir2/$file.sq3"
-	db eval {select value from bucket where key=:key} values {
-		parray values
+	if {$limit > 0} {
+		set bucket_info [db eval "select dir1, dir2, file, row_key from buckets_meta where json_extract(meta, '\$.$jsonkey') = '$jsonval' limit $limit"]
+	} else {
+		set bucket_info [db eval "select dir1, dir2, file, row_key from buckets_meta where json_extract(meta, '\$.$jsonkey') = '$jsonval'"]
 	}
 	db close
-	# enforeach?
+
+	foreach {dir1 dir2 file row_key} $bucket_info {
+		sqlite3 db "$::bucket_root/$dir1/$dir2/$file.sq3"
+		set value [db eval {select value from bucket where key=:row_key}]
+		puts $value
+		db close
+	}
 }
 
 proc aerial_init {} {
