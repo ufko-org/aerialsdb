@@ -36,7 +36,7 @@ Aerials separates data into two main parts:
 ```
 aerial.sq3
   |-- buckets table
-  `-- bucketa_meta table
+  `-- buckets_meta table
 
 bucketroot/
 |-- 28/

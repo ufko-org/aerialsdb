@@ -86,9 +86,10 @@ proc bucket_get {term {json 0}} {
 	set file [lindex $bucket_info 2]
 	set key  [lindex $bucket_info 3]
 	sqlite3 db "$::bucket_root/$dir1/$dir2/$file.sq3"
-	set value [db eval {select value from bucket where key=:key}]
+	db eval {select value from bucket where key=:key} values {
+		parray values
+	}
 	db close
-	puts $value
 }
 
 proc aerial_init {} {
