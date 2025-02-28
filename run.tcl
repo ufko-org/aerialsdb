@@ -17,10 +17,16 @@ proc generate_random_values {} {
     return [binary encode hex $random_data]
 }
 
+# Generates random data
+proc random_gen {length} {
+	set random_bytes [open "/dev/urandom" rb]
+	set random_data [read $random_bytes $length]
+	close $random_bytes
+	binary encode hex $random_data
+}
 # Generates random bucket_path
 proc bucket_path_generator {} {
-	set path [randhex 8]
-	puts $path
+	set path [random_gen 8]
 	set dir1  [string range $path 0 1]
 	set dir2  [string range $path 2 3]
 	set file  [string range $path 4 end]
@@ -32,7 +38,7 @@ proc bucket_set {meta value} {
 
 	# check for free space in the existing bucket
 	set bucket_info [db eval "select rowid, dir1, dir2, file from buckets where rows < $::bucket_max_rows limit 1"]
-	set random_key  [randhex 32]
+	set random_key  [random_gen 32]
 
 	if {[lindex $bucket_info 0] eq "" } {
 		# no rowid, no free space in the existing bucket, creating new bucket, saving key and value
@@ -79,7 +85,6 @@ proc bucket_get {term {json 0}} {
 	set dir2 [lindex $bucket_info 1]
 	set file [lindex $bucket_info 2]
 	set key  [lindex $bucket_info 3]
-	puts "$::bucket_root/$dir1/$dir2/$file.sq3"
 	sqlite3 db "$::bucket_root/$dir1/$dir2/$file.sq3"
 	set value [db eval {select value from bucket where key=:key}]
 	db close
@@ -91,15 +96,14 @@ proc aerial_init {} {
 	db eval {create table if not exists buckets (dir1, dir2, file, rows)}
 	db eval {create table if not exists buckets_meta (dir1, dir2, file, row_key, meta)}
 	db close
+	file mkdir bucketroot
 	puts "Aerial initialized"
 }
 
 proc aerial_clean {} {
-	sqlite3 db aerial.sq3
-	db eval {drop table buckets}
-	db eval {drop table buckets_meta}
-	db close
-	file delete -force {*}[glob "$::bucket_root/*"]
+	file delete -force aerial.sq3
+	file delete -force $::bucket_root
+	#file delete -force {*}[glob "$::bucket_root/*"]
 	puts "Aerial cleaned"
 }
 
