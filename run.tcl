@@ -63,6 +63,7 @@ proc bucket_set {meta value} {
 	db close
 }
 
+# This is going to be fun :D :D
 proc bucket_get {term {json 0}} {
 	#meta value {"file": "file.png", "size": "1024KB", "description": "Image file", "created": "2025-02-27"}
 	#SELECT json_extract(meta, '$.size') FROM buckets_meta where dir='f70' and file='c44ef23c3d84e';
@@ -71,15 +72,17 @@ proc bucket_get {term {json 0}} {
 
 	sqlite3 db aerial.sq3
 	set pattern %$term%
-	set bucket_info [db eval {select dir, file, row_key from buckets_meta where meta like :pattern}]
+	set bucket_info [db eval {select dir1, dir2, file, row_key from buckets_meta where meta like :pattern}]
 	db close
-	set dir [lindex $bucket_info 0]
-	set file [lindex $bucket_info 1]
-	set key [lindex $bucket_info 2]
-	sqlite3 db "$::bucket_root/$dir/$file.sq3"
+	set dir1 [lindex $bucket_info 0]
+	set dir2 [lindex $bucket_info 1]
+	set file [lindex $bucket_info 2]
+	set key  [lindex $bucket_info 3]
+	puts "$::bucket_root/$dir1/$dir2/$file.sq3"
+	sqlite3 db "$::bucket_root/$dir1/$dir2/$file.sq3"
 	set value [db eval {select value from bucket where key=:key}]
 	db close
-	put $value
+	puts $value
 }
 
 proc aerial_init {} {
