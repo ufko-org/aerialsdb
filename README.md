@@ -133,7 +133,7 @@ that if one bucket fails, only its limited number of records are affected.
 
 ## Conclusion
 
-Aerials demonstrates a novel approach to data storage by combining the
+Aerials demonstrates just another approach to data storage by combining the
 simplicity of key-value storage with the flexibility of JSON metadata,
 all while protecting large data values in separate, manageable database
 files.  This architecture is ideal for systems where data types vary,
