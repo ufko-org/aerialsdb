@@ -104,6 +104,7 @@ Imagine you want to store an image. The metadata might look like this:
   "description": "Image file",
   "created": "2025-02-27"
 }
+```
 
 - This JSON acts as the schema for that particular record—defining
 columns such as file, size, description, and created.
