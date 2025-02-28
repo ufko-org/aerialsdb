@@ -1,4 +1,4 @@
-# Aerials – A Distributed, Flexible Data Management System
+# AerialsDB
 
 Aerials is a **proof-of-concept** project designed to rethink how data is
 stored and managed.  Instead of relying on monolithic databases or file
