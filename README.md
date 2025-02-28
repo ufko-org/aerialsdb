@@ -111,8 +111,7 @@ columns such as file, size, description, and created.
 - The actual image (the VALUE) is stored in its own bucket database file
 (e.g., bucketroot/0a/ed088ce1728d52.sq3).
 - The system manages all buckets across various directories, ensuring
-that if one bucket fails, only its limited number of records (roughly
-10) are affected.
+that if one bucket fails, only its limited number of records are affected.
 
 ## Conclusion
 
