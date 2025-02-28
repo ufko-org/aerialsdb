@@ -12,7 +12,9 @@ Aerials separates data into two main parts:
 
 - **Buckets**:
   - Each bucket stores data as simple key-value pairs.
-  - What would be a normal file on disk is a value in the bucket table row.
+  -	A bucket is essentially a micro filesystem.  What would be a normal file
+  on disk is a row in the bucket table in the bucket's database file,
+  where the key is the filename and the value is its content.
   - Buckets are automatically created when an existing bucket reaches a
   set maximum number of rows (defined by `bucket_max_rows` in the
   configuration).
