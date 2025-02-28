@@ -31,6 +31,22 @@ Aerials separates data into two main parts:
   - This approach eliminates the need for a million hardcoded
   columns—each bucket row can be described uniquely and flexibly.
 
+## Data Diagram
+
+aerial.sq3
+  |-- buckets table
+	`-- bucketa_meta table
+
+bucketroot/
+|-- 28/
+|   `-- dd/
+|       `-- 1a21d3fdabf7.sq3
+|           `-- bucket table
+`-- f8/
+    `-- 59/
+        `-- 11cfd37ba0e2.sq3
+            `-- bucket table
+
 ## Key Features
 
 - **Flexibility**:
