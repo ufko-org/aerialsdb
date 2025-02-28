@@ -33,6 +33,7 @@ Aerials separates data into two main parts:
 
 ## Data Diagram
 
+```
 aerial.sq3
   |-- buckets table
 	`-- bucketa_meta table
@@ -46,6 +47,7 @@ bucketroot/
     `-- 59/
         `-- 11cfd37ba0e2.sq3
             `-- bucket table
+```
 
 ## Key Features
 
