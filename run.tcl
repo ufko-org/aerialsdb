@@ -7,7 +7,7 @@
 source config.tcl
 
 # This is a testing helper to quickly create simple json metadata
-# from the list with even number of elements
+# from the list with an even number of elements
 # puts [json1 {name imgfile1 size 25000 type png}]
 proc json1 {lst} {
   if {[llength $lst] % 2 != 0} {
@@ -18,7 +18,7 @@ proc json1 {lst} {
   foreach {key value} $lst {
     append json_str "\"$key\": \"$value\","
   }
-  # remove last comma
+  # remove the last comma
   if {[string length $json_str] > 1} {
     set json_str [string range $json_str 0 end-1]
   }
@@ -40,7 +40,7 @@ proc generate_random_value {} {
 		random_gen $len
 }
 
-# Generates random bucket_path
+# Generates random bucket path
 proc bucket_path_generator {} {
 	set path [random_gen 8]
 	set dir1  [string range $path 0 1]
@@ -51,6 +51,7 @@ proc bucket_path_generator {} {
 
 # Example: bucket_set [json1 {name image2 size 100 type png}] [generate_random_value]
 # Example: bucket_get name image2 
+# Example: bucket_get size 100
 proc bucket_set {meta value} {
 	sqlite3 db aerial.sq3
 
@@ -59,7 +60,7 @@ proc bucket_set {meta value} {
 	set random_key  [random_gen 32]
 
 	if {[lindex $bucket_info 0] eq "" } {
-		# no rowid, no free space in the existing bucket, creating new bucket, saving key and value
+		# no rowid, no free space in the existing bucket, creating new bucket, saving the key and the value
 		set path [bucket_path_generator]
 		set dir1  [lindex	$path 0]
 		set dir2  [lindex	$path 1]
@@ -75,7 +76,7 @@ proc bucket_set {meta value} {
 			values (:dir1, :dir2, :file, :random_key, :meta)}
 		puts "New bucket created"
 	} else {
-		# found free space in existing bucket, saving key and value
+		# found free space in the existing bucket, saving the key and the value
 		set dir1 [lindex $bucket_info 1]
 		set dir2 [lindex $bucket_info 2]
 		set file [lindex $bucket_info 3]
