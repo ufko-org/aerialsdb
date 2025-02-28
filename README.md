@@ -2,7 +2,7 @@
 
 Aerials is a **proof-of-concept** project designed to rethink how data is
 stored and managed.  Instead of relying on monolithic databases or file
-systems with hard limits, Aerials distributes data into discrete
+systems with hard limits, Aerials distributes data into discrete SQLite3
 "buckets" and metadata tables, enabling high flexibility, scalability,
 and enhanced data protection.
 
