@@ -7,10 +7,12 @@
 source config.tcl
 
 # This is a testing helper to quickly create simple json metadata
-# from list with even number of members
+# from the list with even number of elements
 # puts [json1 {name imgfile1 size 25000 type png}]
 proc json1 {lst} {
-  # Todo: check if lst has even number of members :)
+  if {[llength $lst] % 2 != 0} {
+    error "List must have an even number of elements"
+  }
 
   set json_str "{"
   foreach {key value} $lst {
@@ -33,9 +35,9 @@ proc random_gen {length} {
 }
 
 # Generates random test values
-proc generate_random_values {} {
+proc generate_random_value {} {
     set len [expr {int(rand() * 200) + 1}] 
-		random_gen len
+		random_gen $len
 }
 
 # Generates random bucket_path
@@ -47,6 +49,8 @@ proc bucket_path_generator {} {
 	return [list $dir1 $dir2 $file]
 }
 
+# Example: bucket_set [json1 {name image2 size 100 type png}] [generate_random_value]
+# Example: bucket_get name image2 
 proc bucket_set {meta value} {
 	sqlite3 db aerial.sq3
 
@@ -65,8 +69,10 @@ proc bucket_set {meta value} {
 		db2 eval {create table if not exists bucket(key, value)}
 		db2 eval {insert into bucket (key, value) values (:random_key, :value)}
 		db2 close
-		db eval {insert into buckets (dir1, dir2, file, rows) values (:dir1, :dir2, :file, 1)}
-		db eval {insert into buckets_meta (dir1, dir2, file, row_key, meta) values (:dir1, :dir2, :file, :random_key, :meta)}
+		db eval {insert into buckets (dir1, dir2, file, rows) 
+			values (:dir1, :dir2, :file, 1)}
+		db eval {insert into buckets_meta (dir1, dir2, file, row_key, meta) 
+			values (:dir1, :dir2, :file, :random_key, :meta)}
 		puts "New bucket created"
 	} else {
 		# found free space in existing bucket, saving key and value
@@ -76,17 +82,19 @@ proc bucket_set {meta value} {
 		sqlite3 db2 "$::bucket_root/$dir1/$dir2/$file.sq3"
 		db2 eval {insert into bucket (key, value) values (:random_key, :value)}
 		db2 close
-		db eval {update buckets set rows = (rows + 1) where dir1 = :dir1 AND dir2 = :dir2 AND file = :file}
-		db eval {insert into buckets_meta (dir1, dir2, file, row_key, meta) values (:dir1, :dir2, :file, :random_key, :meta)}
+		db eval {update buckets set rows = (rows + 1) 
+			where dir1 = :dir1 AND dir2 = :dir2 AND file = :file}
+		db eval {insert into buckets_meta (dir1, dir2, file, row_key, meta) 
+			values (:dir1, :dir2, :file, :random_key, :meta)}
 		puts "Existing bucket used"
 	}
 
 	db close
 }
 
-# This is going to be fun :D :D
+# Example: bucket_set [json1 {name image2 size 100 type png}] [generate_random_value]
+# Example: bucket_get name image2 
 proc bucket_get {jsonkey jsonval {limit 1}} {
-	# meta value {"file": "file.png", "size": "1024KB", "description": "Image file", "created": "2025-02-27"}
 
 	sqlite3 db aerial.sq3
 	if {$limit > 0} {
@@ -96,10 +104,12 @@ proc bucket_get {jsonkey jsonval {limit 1}} {
 	}
 	db close
 
+	set i 1
 	foreach {dir1 dir2 file row_key} $bucket_info {
 		sqlite3 db "$::bucket_root/$dir1/$dir2/$file.sq3"
 		set value [db eval {select value from bucket where key=:row_key}]
-		puts $value
+		puts "\[Value $i:\] $value"
+		incr i
 		db close
 	}
 }
