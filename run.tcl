@@ -6,6 +6,23 @@
 
 source config.tcl
 
+# This is a testing helper to quickly create simple json metadata
+# from list with even number of members
+# puts [json1 {name imgfile1 size 25000 type png}]
+proc json1 {lst} {
+  # Todo: check if lst has even number of members :)
+
+  set json_str "{"
+  foreach {key value} $lst {
+    append json_str "\"$key\": \"$value\","
+  }
+  # remove last comma
+  if {[string length $json_str] > 1} {
+    set json_str [string range $json_str 0 end-1]
+  }
+  append json_str "}"
+  return $json_str
+}
 
 # Generates random data
 proc random_gen {length} {
