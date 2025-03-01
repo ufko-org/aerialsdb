@@ -34,10 +34,32 @@ proc random_gen {length} {
 	binary encode hex $data
 }
 
-# Generates a random bucket value with a size between 1 and 200
-proc random_val {} {
-	set len [expr {int(rand() * 200) + 1}] 
-	random_gen $len
+# Generates a random bucket value with a size between 1 and -max (default 200)
+# or the value of fixed length -fixed
+proc random_val {args} {
+
+	# Set default values for the named parameters
+	array set opt [concat {-max 200 -fixed 0} $args]
+		
+	# Check if -max and -fixed are even numbers
+	if {($opt(-max) % 2 != 0)} {
+		error "Argument '-max' must be an even number."
+	}
+	if {($opt(-fixed) % 2 != 0) && $opt(-fixed) != 0} {
+		error "Argument '-fixed' must be an even number or default (for random length)."
+	}
+
+	# Generate a fixed length
+	if {$opt(-fixed) != 0} {
+		set len $opt(-fixed)
+	} else {
+		# Generate a random length in the range 2 - $opt(-max), ensuring it's even
+		set len [expr {int(rand() * ($opt(-max) / 2)) * 2 + 2}]
+	}
+
+	set byte_length [expr {$len / 2}]
+	set data [random_gen $byte_length]
+	return [string range $data 0 [expr {$len - 1}]]
 }
 
 # Generates a random bucket path
