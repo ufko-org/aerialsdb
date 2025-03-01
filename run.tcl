@@ -102,9 +102,11 @@ proc bucket_get {jsonkey jsonval {limit 1}} {
 
 	sqlite3 db aerial.sq3
 	if {$limit > 0} {
-		set bucket_info [db eval "select dir, file, row_key from buckets_meta where json_extract(meta, '\$.$jsonkey') = '$jsonval' limit $limit"]
+		set bucket_info [db eval "select dir, file, row_key from buckets_meta 
+			where json_extract(meta, '\$.$jsonkey') = '$jsonval' limit $limit"]
 	} else {
-		set bucket_info [db eval "select dir, file, row_key from buckets_meta where json_extract(meta, '\$.$jsonkey') = '$jsonval'"]
+		set bucket_info [db eval "select dir, file, row_key from buckets_meta 
+			where json_extract(meta, '\$.$jsonkey') = '$jsonval'"]
 	}
 	db close
 
