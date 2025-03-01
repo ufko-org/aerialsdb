@@ -1,14 +1,15 @@
+
 # AerialsDB
 
 **Aerials is a proof-of-concept project** that rethinks data storage and
-management.  Instead of relying on monolithic databases or file systems
+management. Instead of relying on monolithic databases or file systems
 with rigid limits, it distributes data into small, self-contained
-SQLite3 buckets and central metadata tables.
+SQLite3 buckets, along with central metadata tables.
 
 This decentralized approach enhances scalability, flexibility, and fault
-tolerance.  Each bucket is an independent SQLite file storing key-value
-records, ensuring efficient handling of large datasets while mitigating
-risks of data loss from file corruption.
+tolerance. Each bucket is an independent SQLite file that stores
+key-value records, ensuring efficient handling of large datasets while
+minimizing the risks of data loss due to file corruption.
 
 ## Storage Layout
 
@@ -27,6 +28,8 @@ bucketroot/
         `-- 11cfd37ba0e2.sq3
             `-- bucket table
 ```
+
+## Key features
 
 1. **Data is divided into smaller databases called "buckets"** –  
    each bucket is an independent SQLite file containing key-value  
