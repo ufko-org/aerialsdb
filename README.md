@@ -10,7 +10,7 @@ tolerance.  Each bucket is an independent SQLite file storing key-value
 records, ensuring efficient handling of large datasets while mitigating
 risks of data loss from file corruption.
 
-## Data Diagram
+## Storage Layout
 
 ```
 aerial.sq3
