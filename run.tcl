@@ -100,13 +100,18 @@ proc bucket_add {ukey value} {
 
 # Example: bucket_add [json1 {name image2 size 100 type png}] [random_val]
 # Example: bucket_get name image2 
-proc bucket_get {ukey {like ""} {limit 1}} {
+proc bucket_get {ukey {limit 1}} {
+
 	sqlite3 db aerial.sq3
-	if {$like eq "like"} {
-		set sql "select dir, file, bkey from buckets_meta where key LIKE '$ukey%' limit $limit;"
-	} else {
-		set sql "select dir, file, bkey from buckets_meta where key = '$ukey';"
-	}
+	# If ukey contains "*", replace it with "%" for SQL LIKE query
+  if {[string match "*\**" $ukey]} {
+    set ukey [string map {"*" "%"} $ukey]
+    set sql "SELECT dir, file, bkey FROM buckets_meta WHERE key LIKE '$ukey' LIMIT $limit;"
+  } else {
+    # If no "*", perform an exact match query
+    set sql "SELECT dir, file, bkey FROM buckets_meta WHERE key = '$ukey';"
+  }
+	#puts $sql
 	set bucket_info [db eval $sql]
 	db close
 

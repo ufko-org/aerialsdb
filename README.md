@@ -1,36 +1,14 @@
 # AerialsDB
 
-Aerials is a **proof-of-concept** project designed to rethink how data is
-stored and managed.  Instead of relying on monolithic databases or file
-systems with hard limits, Aerials distributes data into discrete SQLite3
-"buckets" and metadata tables, enabling high flexibility, scalability,
-and enhanced data protection.
+Aerials is a proof-of-concept project that rethinks data storage and
+management.  Instead of relying on monolithic databases or file systems
+with rigid limits, it distributes data into small, self-contained
+SQLite3 buckets and central metadata tables.
 
-## Overview
-
-Aerials separates data into two main parts:
-
-- **Buckets**:
-  - Each bucket stores data as simple key-value pairs.
-  -	A bucket is essentially a micro filesystem.  What would be a normal file
-  on disk is a row in the bucket table in the bucket's database file,
-  where the key is the filename and the value is its content.
-  - Buckets are automatically created when an existing bucket reaches a
-  set maximum number of rows (defined by `bucket_max_rows` in the
-  configuration).
-
-- **Metadata (buckets_meta)**:
-  - A separate table (`buckets_meta`) holds metadata about each bucket
-  entry.
-  - This metadata is stored as a JSON string, which acts like a “virtual
-  table” schema.
-  - The JSON can describe properties such as filename, size,
-  description, creation date, etc.
-  - If multiple rows in `buckets_meta` share the same JSON structure,
-  it’s equivalent to having a virtual table with those JSON keys as
-  columns.
-  - This approach eliminates the need for a million hardcoded
-  columns—each bucket row can be described uniquely and flexibly.
+This decentralized approach enhances scalability, flexibility, and fault
+tolerance.  Each bucket is an independent SQLite file storing key-value
+records, ensuring efficient handling of large datasets while mitigating
+risks of data loss from file corruption.
 
 ## Data Diagram
 
@@ -50,92 +28,74 @@ bucketroot/
             `-- bucket table
 ```
 
-## Key Features
+### **Decentralized Data Storage with Small Buckets**  
 
-- **Flexibility**:
-  - Use JSON in the metadata column to describe each bucket’s data.  For
-  example, one record’s metadata could be:
+#### **1. Bucket Size**  
+Each bucket is intentionally kept small, containing only a 
+limited number of records. This means that if a file gets 
+corrupted (e.g., due to disk failure), only the records within 
+that specific bucket are lost. This design significantly reduces 
+the risk of large-scale data loss, improving the system’s 
+resilience to failures.  
 
-    ```json
-    {
-      "file": "file.png",
-      "size": "1024KB",
-      "description": "Image file",
-      "created": "2025-02-27"
-    }
-    ```
+#### **2. Bypassing Filesystem (FS) Limitations**  
+Since each bucket is stored as a separate SQLite file, this 
+system effectively bypasses filesystem-imposed limitations. 
+For instance, if a filesystem enforces a maximum file size 
+(e.g., 4GB), splitting data into small buckets allows you to 
+circumvent this restriction. This makes it possible to manage 
+vast amounts of data that would otherwise be challenging to 
+store in a single file.  
 
-This is equivalent to having a virtual table with columns `file`,
-`size`, `description`, `created`, plus the large data value stored
-separately.
+#### **3. Data Integrity and Fault Tolerance**  
+Despite being decentralized and distributing data across 
+multiple buckets, each bucket maintains its own metadata and 
+database file stored on disk. If a file is corrupted or if a 
+write operation fails, the system ensures data integrity 
+through:  
 
-- **Data Protection & Risk Mitigation**:
-  - Instead of having all data in one huge database file, each bucket is
-  stored in its own SQLite file.  If one bucket is lost or corrupted,
-  only about 10 records (as set by your bucket size) are affected rather
-  than the entire dataset.
-- **Scalability**:
-  - Data is organized across multiple directories and database files.
-  This not only helps overcome file system limitations on file and
-  directory counts but also allows the system to scale gracefully as the
-  dataset grows.
-- **Efficient Backup & Recovery**:
-  - Buckets can be dumped or backed up gradually, bucket by bucket,
-  reducing the risk of overwhelming the system and allowing continuous
-  operation.
+- **Limited Damage**: If a bucket file becomes corrupted, only 
+  the records within that specific bucket are affected. The 
+  issue is constrained to a maximum of *N* records, ensuring 
+  that the rest of the data remains intact and the system can 
+  continue running without major disruption.  
+- **Automatic Recovery**: If corruption is detected, the system 
+  can implement recovery mechanisms such as replication or 
+  restoring from a backup.  
 
-## How It Works
+#### **4. Decentralization Benefits**  
+This architecture is highly efficient for applications requiring 
+decentralized data storage. Since data is split into multiple 
+small buckets, each operating independently, this structure 
+offers:  
 
-- **Data Ingestion**:
-  - When new data is added via the `bucket_set` function, the system
-  checks the main buckets table for an available bucket (one that has
-  fewer than 10 rows).
-  - If an available bucket exists, the data (key and value) is inserted
-  into that bucket’s SQLite file, and a corresponding entry is created
-  in `buckets_meta` with its metadata (JSON).
-  - If no available bucket exists, a new bucket is created in a new
-  SQLite file located in a directory based on a generated bucket path.
+- **Fast Access & Scalability**: Distributing data across small 
+  buckets improves search and write performance since each 
+  bucket is managed separately.  
+- **Increased Security**: In case of bucket failure, data loss 
+  is minimal and only affects a small portion of the system.  
+- **Flexibility & Scalability**: The system supports horizontal 
+  scaling, where new buckets can be added seamlessly without 
+  affecting existing data structures.  
 
-- **Data Retrieval**:
-  - The `bucket_get` function enables searching for a specific record by
-  querying the `buckets_meta` table with a text search (using LIKE),
-  treating the JSON as a simple text string.
-  - Once the relevant bucket (and corresponding key) is found, the
-  actual value is fetched from the associated bucket file.
+#### **5. Storing Files in Buckets**  
+Since the system is based on small SQLite files, it can be used 
+to store larger files or data blocks. This method allows you to 
+bypass filesystem constraints related to file size or directory 
+limits.  
 
-- **Virtual Tables via JSON**:
-  - Although the system uses only two main tables (`buckets_meta` for
-  metadata and the per-bucket table for data), each JSON in
-  `buckets_meta` acts as a flexible description of a “virtual table.”
-  - If two rows share an identical JSON structure, it’s as if they
-  belong to the same virtual table with custom columns, but the actual
-  large data (the VALUE) is safely stored in a separate DB file.
+- **File Data in Small Chunks**: Files can be stored in these 
+  buckets as binary data. This approach circumvents restrictions 
+  when handling large files or datasets that would otherwise be 
+  difficult to manage within a single file.  
+- **File Distribution**: This method enables efficient 
+  distribution of large files across multiple systems or nodes 
+  without storing them as monolithic files, simplifying 
+  management and scalability.  
 
-
-## Usage Example
-
-Imagine you want to store an image. The metadata might look like this:
-
-```json
-{
-  "file": "file.png",
-  "size": "1024KB",
-  "description": "Image file",
-  "created": "2025-02-27"
-}
-```
-
-- This JSON acts as the schema for that particular record—defining
-columns such as file, size, description, and created.
-- The actual image (the VALUE) is stored in its own bucket database file
-(e.g., bucketroot/0a/ed088ce1728d52.sq3).
-- The system manages all buckets across various directories, ensuring
-that if one bucket fails, only its limited number of records are affected.
-
-## Conclusion
-
-Aerials demonstrates just another approach to data storage by combining the
-simplicity of key-value storage with the flexibility of JSON metadata,
-all while protecting large data values in separate, manageable database
-files.  This architecture is ideal for systems where data types vary,
-and where risk mitigation and scalability are crucial.
+---  
+This decentralized approach with small buckets offers high 
+flexibility, efficiency, and fault tolerance. Splitting data 
+into small, independent files improves performance, minimizes 
+data loss risks, and bypasses traditional filesystem 
+limitations.
