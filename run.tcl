@@ -53,10 +53,17 @@ proc random_path {} {
 	return [list "$dir1/$dir2" $file]
 }
 
-# Example: bucket_add user:1:name [random_val]
-# Example: bucket_add image:png:123 [random_val]
-# Example: bucket_add "free hand key :)" [random_val]
-proc bucket_add {ukey value} {
+proc bset {ukey value} {
+	# if ukey doesn't exist
+	badd $ukey $value
+	# else 
+	#bupd $ukey $value
+}
+
+proc badd {ukey value} {
+	if {[string index "\*" $ukey] != -1]} {
+		error "Key name can't contain \*"
+	}
 	sqlite3 db aerial.sq3
 
 	# Check for free space in the existing bucket
@@ -100,10 +107,7 @@ proc bucket_add {ukey value} {
 	db close
 }
 
-# Example: bucket_add [json1 {name image2 size 100 type png}] [random_val]
-# Example: bucket_get name image2 
-proc bucket_get {ukey {limit 1}} {
-
+proc bget {ukey {limit 1}} {
 	sqlite3 db aerial.sq3
 	# If ukey contains "*", replace it with "%" for SQL LIKE query
   if {[string match "*\**" $ukey]} {
@@ -127,10 +131,27 @@ proc bucket_get {ukey {limit 1}} {
 	}
 }
 
+proc bget_sql {sql} {
+	
+}
+
+proc bkeys {ukey} {
+  if {[string match "*\**" $ukey]} {
+    set ukey [string map {"*" "%"} $ukey]
+	}
+  set sql "SELECT key FROM buckets_meta WHERE key LIKE '$ukey' order by key ASC;"
+	sqlite3 db aerial.sq3
+	set result [db eval $sql]
+	foreach key $result {
+		puts $key
+	}
+	db close
+}
+
 proc aerial_init {} {
 	sqlite3 db aerial.sq3
 	db eval {create table if not exists buckets (dir, file, rows)}
-	db eval {create table if not exists buckets_meta (dir, file, bkey unique, key unique)}
+	db eval {create table if not exists buckets_meta (dir, file, bkey unique, key unique, key_meta)}
 	db close
 	file mkdir bucketroot
 	puts "Aerial initialized"
