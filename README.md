@@ -1,6 +1,6 @@
 # AerialsDB
 
-Aerials is a proof-of-concept project that rethinks data storage and
+**Aerials is a proof-of-concept project** that rethinks data storage and
 management.  Instead of relying on monolithic databases or file systems
 with rigid limits, it distributes data into small, self-contained
 SQLite3 buckets and central metadata tables.
