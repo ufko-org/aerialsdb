@@ -54,14 +54,19 @@ proc random_path {} {
 }
 
 proc bset {ukey value} {
-	# if ukey doesn't exist
-	badd $ukey $value
-	# else 
-	#bupd $ukey $value
+	sqlite3 db aerial.sq3
+	set exists [db eval {select 1 from buckets_meta where key = :ukey}]
+	db close
+
+	if {$exists == 1} {
+		bupd $ukey $value
+	} else {
+		badd $ukey $value
+	}
 }
 
 proc badd {ukey value} {
-	if {[string index "\*" $ukey] != -1]} {
+	if {[string first "\*" $ukey] != -1} {
 		error "Key name can't contain \*"
 	}
 	sqlite3 db aerial.sq3
@@ -105,6 +110,10 @@ proc badd {ukey value} {
 	}
 
 	db close
+}
+
+proc bupd {ukey value} {
+	puts "Updating ..."
 }
 
 proc bget {ukey {limit 1}} {
