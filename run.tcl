@@ -36,8 +36,8 @@ proc random_gen {length} {
 
 # Generates random test values
 proc generate_random_value {} {
-    set len [expr {int(rand() * 200) + 1}] 
-		random_gen $len
+	set len [expr {int(rand() * 200) + 1}] 
+	random_gen $len
 }
 
 # Generates random bucket path
