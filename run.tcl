@@ -10,20 +10,20 @@ source config.tcl
 # from a 1-level list with an even number of elements
 # json1 {name imgfile1 size 25000 type png}
 proc json1 {lst} {
-  if {[llength $lst] % 2 != 0} {
-    error "List must have an even number of elements"
-  }
+	if {[llength $lst] % 2 != 0} {
+		error "List must have an even number of elements"
+	}
 
-  set json_str "{"
-  foreach {key value} $lst {
-    append json_str "\"$key\": \"$value\","
-  }
-  # remove the last comma
-  if {[string length $json_str] > 1} {
-    set json_str [string range $json_str 0 end-1]
-  }
-  append json_str "}"
-  return $json_str
+	set json_str "{"
+	foreach {key value} $lst {
+		append json_str "\"$key\": \"$value\","
+	}
+	# remove the last comma
+	if {[string length $json_str] > 1} {
+		set json_str [string range $json_str 0 end-1]
+	}
+	append json_str "}"
+	return $json_str
 }
 
 # Generates random data
