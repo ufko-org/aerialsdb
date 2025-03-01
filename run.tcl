@@ -4,7 +4,9 @@
 # See LICENSE file in the project root for details.
 # ---------------------------------------------------------------------
 
-source config.tcl
+set bucket_root bucketroot
+set bucket_max_rows 10
+set bucket_max_size 0
 
 # Generates random data
 proc random_gen {length} {
@@ -14,7 +16,7 @@ proc random_gen {length} {
 	binary encode hex $data
 }
 
-# Generates a random bucket value with a size between 1 and -max (default 200)
+# Generates a random bucket testing value with a size between 1 and -max (default 200)
 # or the value of fixed length -fixed
 proc random_val {args} {
 
