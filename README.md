@@ -8,7 +8,7 @@ SQLite3 buckets, along with central metadata tables.
 
 This decentralized approach enhances scalability, flexibility, and fault 
 tolerance. Each bucket is an independent SQLite file that stores 
-key-value records, ensuring efficient handling of large datasets while 
+**value** records, ensuring efficient handling of large datasets while 
 minimizing the risks of data loss due to file corruption.
 
 ## Storage Layout
