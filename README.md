@@ -16,13 +16,13 @@ minimizing the risks of data loss due to file corruption.
 ```
 aerial.sq3
   |-- buckets table
-  `-- buckets_meta table
+  `-- buckets_meta table with keys
 
 bucketroot/
 |-- 28/
 |   `-- dd/
 |       `-- 1a21d3fdabf7.sq3
-|           `-- bucket table
+|           `-- bucket table with values
 `-- f8/
     `-- 59/
         `-- 11cfd37ba0e2.sq3
